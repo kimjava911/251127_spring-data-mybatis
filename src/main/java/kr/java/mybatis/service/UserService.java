@@ -34,6 +34,7 @@ public class UserService {
         // 예외 발생 -> 두 INSERT 모두 롤백
     }
 
+    @Transactional(readOnly = true)
     public UserInfo login(String username, String password) {
         UserLogin userLogin = userMapper.findLoginByUsername(username);
 

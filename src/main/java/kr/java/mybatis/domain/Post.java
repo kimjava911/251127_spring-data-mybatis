@@ -2,6 +2,8 @@ package kr.java.mybatis.domain;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class Post {
     private Long id;
@@ -13,4 +15,7 @@ public class Post {
 
     // 1:N 관계 : 작성자 정보
     private UserInfo author;
+
+    // M:N 관계 : 좋아요 목록
+    private List<UserInfo> likedUsers;
 }

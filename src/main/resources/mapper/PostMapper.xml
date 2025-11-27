@@ -35,4 +35,60 @@
                  INNER JOIN user_info ui ON p.author_id = ui.id
         ORDER BY p.created_at DESC
     </select>
+
+    <!-- M:N 관계를 위한 ResultMap -->
+    <resultMap id="postWithLikesMap" type="Post" extends="postWithAuthorMap">
+        <!-- 일종의 상속 개념 -->
+        <collection property="likedUsers" ofType="UserInfo">
+            <id property="id" column="liker_id" />
+            <result property="nickname" column="nickname" />
+        </collection>
+    </resultMap>
+
+    <!-- 게시글 상세 조회 (M:N 관계 포함) -->
+    <select id="findByIdWithDetails" resultMap="postWithLikesMap">
+        SELECT
+            p.id, p.author_id, p.title, p.content,
+            p.like_count, p.created_at,
+            ui.nickname,
+            liker.id AS liker_id,
+            liker.nickname AS liker_nickname
+        FROM post p
+                 INNER JOIN user_info ui ON p.author_id = ui.id
+                 LEFT JOIN post_like pl ON p.id = pl.post_id
+                 LEFT JOIN user_info liker ON pl.user_id = liker.id
+        WHERE p.id = #{id}
+    </select>
+
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike">
+        INSERT INTO post_like (user_id, post_id)
+        VALUES (#{userId}, #{postId})
+    </insert>
+
+    <!-- 좋아요 삭제 -->
+    <delete id="deleteLike">
+        DELETE FROM post_like
+        WHERE user_id = #{userId} AND post_id = #{postId}
+    </delete>
+
+    <!-- 좋아요 수 증가 -->
+    <update id="increaseLikeCount">
+        UPDATE post SET like_count = like_count + 1
+        WHERE id = #{postId}
+    </update>
+
+    <!-- 좋아요 수 감소 -->
+    <update id="decreaseLikeCount">
+        UPDATE post SET like_count = like_count - 1
+        WHERE id = #{postId}
+    </update>
+
+    <!-- 좋아요 여부 확인 -->
+    <!-- 1, 0 -> true/false -> boolean -->
+    <select id="isLiked" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM post_like
+        WHERE user_id = #{userId} AND post_id = #{postId}
+    </select>
 </mapper>

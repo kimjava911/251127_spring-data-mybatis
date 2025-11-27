@@ -2,15 +2,13 @@ package kr.java.mybatis.controller;
 
 import jakarta.servlet.http.HttpSession;
 import kr.java.mybatis.domain.UserInfo;
+import kr.java.mybatis.mapper.PostMapper;
 import kr.java.mybatis.service.PostService;
 import kr.java.mybatis.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/posts")
@@ -22,6 +20,25 @@ public class PostController {
     public String index(Model model) {
         model.addAttribute("posts", postService.getAllPosts());
         return "posts";
+    }
+
+    @GetMapping("/{postId}")
+    public String detail(
+            @PathVariable long postId,
+            Model model
+    ) {
+        model.addAttribute("post", postService.getPost(postId));
+        return "detail";
+    }
+
+    @PostMapping("/{postId}/like")
+    public String like(
+            @PathVariable long postId,
+            HttpSession session
+    ) {
+        UserInfo info = (UserInfo) session.getAttribute("loginUser");
+        postService.toggleLike(info.getId(), postId);
+        return "redirect:/posts/{postId}";
     }
 
     @GetMapping("/create")
