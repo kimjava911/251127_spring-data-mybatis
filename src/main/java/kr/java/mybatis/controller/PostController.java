@@ -6,6 +6,7 @@ import kr.java.mybatis.service.PostService;
 import kr.java.mybatis.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,8 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public String index() {
+    public String index(Model model) {
+        model.addAttribute("posts", postService.getAllPosts());
         return "posts";
     }
 

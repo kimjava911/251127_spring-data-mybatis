@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -26,5 +28,11 @@ public class PostService {
         post.setContent(content);
 
         postMapper.insertPost(post);
+    }
+
+    // 게시글 목록 조회 (읽기 전용)
+    @Transactional(readOnly = true)
+    public List<Post> getAllPosts() {
+        return postMapper.findAllWithAuthor();
     }
 }
